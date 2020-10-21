@@ -15,7 +15,7 @@ ApplicationWindow {
     function updateEllipse() {
         var context = ellipse_canvas.getContext("2d")
         context.reset()
-        if (viewer.ellipse_params.length == 5) {
+        if (shape_fit.ellipse_params.length === 5) {
            ellipse_canvas.requestPaint()
         }
     }
@@ -36,10 +36,10 @@ ApplicationWindow {
         Menu {
             title: qsTr("&Fit")
             Action { text: qsTr("Ellipse")
-                onTriggered:viewer.set_shape("ellipse")
+                onTriggered:shape_fit.set_shape("ellipse")
                    }
             Action { text: qsTr("&Circle")
-                onTriggered: viewer.set_shape("circle")
+                onTriggered: shape_fit.set_shape("circle")
             }
             Action { text: qsTr("&Paste") }
         }
@@ -155,14 +155,14 @@ ApplicationWindow {
                     }
 
                     Repeater {
-                       model: viewer.selected_points
+                       model: shape_fit.selected_points
 
                        Canvas{
                             id:points_canvas
                             width: parent.width
                             height: parent.height
                             z: dragArea.z + 50
-                            visible: viewer.selected_points.length > 0
+                            visible: shape_fit.selected_points.length > 0
 
                             onPaint: {
                                 var context = getContext("2d")
@@ -185,29 +185,31 @@ ApplicationWindow {
                         width: parent.width
                         height: parent.height
                         z: dragArea.z + 50
-                        visible: viewer.ellipse_params.length > 0
+                        visible: shape_fit.ellipse_params.length > 0
 
                         onPaint: {
                             var context = getContext("2d")
                             context.reset()
                             context.linewidth = 1
                             context.strokeStyle = Qt.rgba(255, 0, 0, 1)
-                            context.save()
-                            if(viewer.get_shape() == "ellipse")
-                                context.beginPath()
-                                context.translate(viewer.ellipse_params[0], viewer.ellipse_params[1])
-                                context.rotate(viewer.ellipse_params[4])
-                                context.ellipse(-viewer.ellipse_params[2], -viewer.ellipse_params[3], viewer.ellipse_params[2] * 2, viewer.ellipse_params[3] * 2)
-                                context.stroke()
-                                context.restore()
-                                context.moveTo(viewer.ellipse_params[0],viewer.ellipse_params[1]-10)
-                                context.lineTo(viewer.ellipse_params[0],viewer.ellipse_params[1]+10)
-                                context.moveTo(viewer.ellipse_params[0]-10,viewer.ellipse_params[1])
-                                context.lineTo(viewer.ellipse_params[0]+10,viewer.ellipse_params[1])
-                                context.stroke()
-                            if(viewer.get_shape() == "circle")
-                                context.arc(x_centro,y_centro,radio,0,2*Math.PI,false)
 
+                            context.save()
+                            context.beginPath()
+                            context.translate(shape_fit.ellipse_params[0], shape_fit.ellipse_params[1])
+                            context.rotate(shape_fit.ellipse_params[4])
+                            context.ellipse(-shape_fit.ellipse_params[2], -shape_fit.ellipse_params[3], shape_fit.ellipse_params[2] * 2, shape_fit.ellipse_params[3] * 2)
+                            context.stroke()
+                            context.restore()
+
+
+//                         context.arc(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1],shape_fit.ellipse_params[2],0,2*Math.PI,false)
+
+
+                            context.moveTo(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1]-10)
+                            context.lineTo(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1]+10)
+                            context.moveTo(shape_fit.ellipse_params[0]-10,shape_fit.ellipse_params[1])
+                            context.lineTo(shape_fit.ellipse_params[0]+10,shape_fit.ellipse_params[1])
+                            context.stroke()
                                 //ctx.fillStyle = Qt.rgba(1,0,0,0);
                                 //ctx.fillRect(0,0,width,height);
 
@@ -271,7 +273,7 @@ ApplicationWindow {
                             onClicked: {
                                 selected_point.X = Math.round(mouseX * pinchArea.scale)
                                 selected_point.Y = Math.round(mouseY * pinchArea.scale)
-                                viewer.add_new_point(selected_point)
+                                shape_fit.add_new_point(selected_point)
 
                             }
 
