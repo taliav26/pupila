@@ -15,7 +15,7 @@ ApplicationWindow {
     function updateEllipse() {
         var context = ellipse_canvas.getContext("2d")
         context.reset()
-        if (shape_fit.ellipse_params.length === 5) {
+        if (shape_fit.shape_params.length === 5) {
            ellipse_canvas.requestPaint()
         }
     }
@@ -36,10 +36,10 @@ ApplicationWindow {
         Menu {
             title: qsTr("&Fit")
             Action { text: qsTr("Ellipse")
-                onTriggered:shape_fit.set_shape("ellipse")
+                onTriggered:shape_fit.shape = "ellipse"
                    }
             Action { text: qsTr("&Circle")
-                onTriggered: shape_fit.set_shape("circle")
+                onTriggered: shape_fit.shape = "circle"
             }
             Action { text: qsTr("&Paste") }
         }
@@ -185,7 +185,7 @@ ApplicationWindow {
                         width: parent.width
                         height: parent.height
                         z: dragArea.z + 50
-                        visible: shape_fit.ellipse_params.length > 0
+                        visible: shape_fit.shape_params.length > 0
 
                         onPaint: {
                             var context = getContext("2d")
@@ -195,20 +195,20 @@ ApplicationWindow {
 
                             context.save()
                             context.beginPath()
-                            context.translate(shape_fit.ellipse_params[0], shape_fit.ellipse_params[1])
-                            context.rotate(shape_fit.ellipse_params[4])
-                            context.ellipse(-shape_fit.ellipse_params[2], -shape_fit.ellipse_params[3], shape_fit.ellipse_params[2] * 2, shape_fit.ellipse_params[3] * 2)
+                            context.translate(shape_fit.shape_params[0], shape_fit.shape_params[1])
+                            context.rotate(shape_fit.shape_params[4])
+                            context.ellipse(-shape_fit.shape_params[2], -shape_fit.shape_params[3], shape_fit.shape_params[2] * 2, shape_fit.shape_params[3] * 2)
                             context.stroke()
                             context.restore()
 
 
-//                         context.arc(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1],shape_fit.ellipse_params[2],0,2*Math.PI,false)
+//                         context.arc(shape_fit.shape_params[0],shape_fit.shape_params[1],shape_fit.shape_params[2],0,2*Math.PI,false)
 
 
-                            context.moveTo(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1]-10)
-                            context.lineTo(shape_fit.ellipse_params[0],shape_fit.ellipse_params[1]+10)
-                            context.moveTo(shape_fit.ellipse_params[0]-10,shape_fit.ellipse_params[1])
-                            context.lineTo(shape_fit.ellipse_params[0]+10,shape_fit.ellipse_params[1])
+                            context.moveTo(shape_fit.shape_params[0],shape_fit.shape_params[1]-10)
+                            context.lineTo(shape_fit.shape_params[0],shape_fit.shape_params[1]+10)
+                            context.moveTo(shape_fit.shape_params[0]-10,shape_fit.shape_params[1])
+                            context.lineTo(shape_fit.shape_params[0]+10,shape_fit.shape_params[1])
                             context.stroke()
                                 //ctx.fillStyle = Qt.rgba(1,0,0,0);
                                 //ctx.fillRect(0,0,width,height);
@@ -323,14 +323,74 @@ ApplicationWindow {
 
         Rectangle {
             id: rightItem
-            visible: viewer.selected_file.toString() !== ""
-            SplitView.minimumWidth: window.width*0.2
+            visible: shape_fit.selected_points.length > 0
+            SplitView.minimumWidth: 0
+            SplitView.preferredWidth: window.width*0.2
             SplitView.maximumWidth: window.width*0.3
             color: "white"
-            Text {
-                text: "Tools panel"
-                anchors.centerIn: parent
-            }
+
+
+            Column {
+
+                Repeater {
+                     model: shape_fit.selected_points //["apples", "oranges", "pears"]
+                     Text { text: "Punto " + (index + 1).toString() + ": (" + Math.round(modelData.x) + ", " + Math.round(modelData.y) + ")" }
+
+                }
+
+                 Text {
+
+                     id: params
+                     textFormat: Text.RichText
+                     font.family: "Liberation Sans"
+                     font.pixelSize: 14
+                     visible:shape_fit.shape_params.length > 0
+                     text:"<h3><br>Parámetros</h3>" + getShapeParamsFormattedText()
+
+                     function getShapeParamsFormattedText() {
+                         var text = "Centro: (" + Math.round(shape_fit.shape_params[0]) +", " + Math.round(shape_fit.shape_params[1]) + ")<br>"
+                         if (shape_fit.shape === "ellipse") {
+                             text += "Semieje mayor: " + Math.round(shape_fit.shape_params[2]) + " px<br>" +
+                                     "Semieje menor: " + Math.round(shape_fit.shape_params[3]) + " px<br>" +
+                                     "Ángulo de rotación: " + Math.round (shape_fit.shape_params[4] * 180 / Math.PI) + "°<br>"
+                         } else if (shape_fit.shape === "circle") {
+                             text += "Radio: " + Math.round(shape_fit.shape_params[2]) + " px<br>"
+                         }
+                         return text
+                     }
+                 }
+                 padding: 10
+
+                 Row {
+                     spacing: 10
+
+                     RoundButton {
+                         visible: shape_fit.shape_params.length > 0
+                         text: " Guardar "
+                         width:rightItem.width*0.4
+                         height: rightItem.height*0.08
+                         palette {
+                                 button: "lightgreen"
+                                 buttonText: "black"
+                             }
+                         //flat: true
+                         onClicked:
+                            {shape_fit.save2csv(viewer.selected_file)// model.submit()
+
+                            }
+                     }
+
+                     RoundButton {
+                          visible: shape_fit.shape_params.length > 0
+                          text: "Cancel"
+                          width:rightItem.width*0.4
+                          height: rightItem.height*0.08
+                          highlighted: true
+                          onClicked: model.revert()
+                            }
+                        }
+
+                   }
         }
     }
 
@@ -361,6 +421,7 @@ ApplicationWindow {
         onAccepted: {
 
             viewer.selected_file = fileDialog.fileUrl
+
 
         }
     }

@@ -1,11 +1,10 @@
 from PySide2.QtCore import QObject, Slot, QPointF, Signal, Property, QThread
-
+import pandas as pd
 from circle_fit import CircleFit
 from ellipse_fit import EllipseFit
+import csv
 
 MINIMUM_POINTS = 5
-
-global app
 
 
 class ShapeFit(QObject):
@@ -40,14 +39,16 @@ class ShapeFit(QObject):
     def reset_shape(self):
         self.set_shape_params([])
         self.set_selected_points([])
+
     @Slot()
     def get_shape(self):
         return self._shape
 
     @Slot(str)
     def set_shape(self, shape):
+        self.reset_shape()
         self._shape = shape
-        print(self._shape)
+        self.on_shape.emit()
 
     @Slot(QPointF)
     def add_new_point(self, point):
@@ -77,8 +78,32 @@ class ShapeFit(QObject):
         self.worker_thread.start()
         QThread.msleep(1)
 
+    @Slot(str)
+    def save2csv(self, file_name):
+        print(file_name)
+        name_dict = {
+            'X_Center': [self._shape_params[0]],
+            'Y_Center': [self._shape_params[1]],
+            'Radius': [(self._shape_params[2]+self._shape_params[2])/2],
+            'Major_axis': [self._shape_params[2]],
+            'Minor_axis': [self._shape_params[3]],
+            'Angle_of_Rotation': [self._shape_params[4]]
+        }
+
+        df = pd.DataFrame(name_dict)
+
+        print(df)
+        df.to_csv(file_name + '.csv', index = False)
+        '''exp_csv = open(file_name + '.csv', 'w')
+        writer = csv.writer(exp_csv)
+
+        writer.writerow(self.shape_params)
+        exp_csv.close()'''
+
     on_selected_point = Signal()
     on_shape_params = Signal()
+    on_shape = Signal()
 
+    shape = Property(str, get_shape, set_shape, notify=on_shape)
+    shape_params = Property('QVariantList', get_shape_params, set_shape_params, notify=on_shape_params)
     selected_points = Property('QVariantList', get_selected_points, set_selected_points, notify=on_selected_point)
-    ellipse_params = Property('QVariantList', get_shape_params, set_shape_params, notify=on_shape_params)

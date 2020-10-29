@@ -1,6 +1,5 @@
 import os
 import re
-
 from PySide2.QtCore import QObject, QStringListModel, QUrl, Slot, Signal, Property, QAbstractItemModel
 
 
