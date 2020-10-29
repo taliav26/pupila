@@ -28,7 +28,9 @@ ApplicationWindow {
             Action { text: qsTr("&Open...")
                 onTriggered: fileDialog.open()
             }
-            Action { text: qsTr("&Save") }
+            Action { text: qsTr("&Show Annotation")
+                onTriggered: shape_fit.display_annotation(viewer.selected_file)
+            }
             Action { text: qsTr("Save &As...") }
             MenuSeparator { }
             Action { text: qsTr("&Quit") }

@@ -84,21 +84,31 @@ class ShapeFit(QObject):
         name_dict = {
             'X_Center': [self._shape_params[0]],
             'Y_Center': [self._shape_params[1]],
-            'Radius': [(self._shape_params[2]+self._shape_params[2])/2],
+            'Radius': [(self._shape_params[2] + self._shape_params[3]) / 2],
             'Major_axis': [self._shape_params[2]],
             'Minor_axis': [self._shape_params[3]],
             'Angle_of_Rotation': [self._shape_params[4]]
         }
 
         df = pd.DataFrame(name_dict)
-
         print(df)
-        df.to_csv(file_name + '.csv', index = False)
+        df.to_csv(file_name + '.csv', index=False)
+
         '''exp_csv = open(file_name + '.csv', 'w')
         writer = csv.writer(exp_csv)
 
         writer.writerow(self.shape_params)
         exp_csv.close()'''
+
+    @Slot(str)
+    def display_annotation(self, file_name):
+        self.reset_shape()
+        data = pd.read_csv(file_name + '.csv')
+        data_list = [data.columns.values.tolist()] + data.values.tolist()
+        params = data_list[1]  # values x_center, y_center, aprox_radius, major_axis, minor_axis, angle
+        params.pop(2)
+        print(params)
+        self.set_shape_params(params)
 
     on_selected_point = Signal()
     on_shape_params = Signal()
