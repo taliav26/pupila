@@ -2,7 +2,7 @@ from PySide2.QtCore import QObject, Slot, QPointF, Signal, Property, QThread
 import pandas as pd
 from circle_fit import CircleFit
 from ellipse_fit import EllipseFit
-import csv
+
 
 MINIMUM_POINTS = 5
 
@@ -14,6 +14,7 @@ class ShapeFit(QObject):
         self._selected_points = []
         self._shape_params = []
         self._shape = ""
+        self._msg = ""
         self.worker_thread = None
 
     def get_selected_points(self):
@@ -39,6 +40,8 @@ class ShapeFit(QObject):
     def reset_shape(self):
         self.set_shape_params([])
         self.set_selected_points([])
+        self._msg = ""
+        self.on_msg.emit()
 
     @Slot()
     def get_shape(self):
@@ -94,6 +97,14 @@ class ShapeFit(QObject):
         print(df)
         df.to_csv(file_name + '.csv', index=False)
 
+        if df.empty:
+            self._msg = "The file is empty"
+            self.on_msg.emit()
+
+        else:
+            self._msg = "The file was saved successfully"
+            self.on_msg.emit()
+
         '''exp_csv = open(file_name + '.csv', 'w')
         writer = csv.writer(exp_csv)
 
@@ -110,10 +121,19 @@ class ShapeFit(QObject):
         print(params)
         self.set_shape_params(params)
 
+    def get_msg(self):
+        return self._msg
+
+    def set_msg(self, text):
+        self._msg = text
+        return self._msg
+
     on_selected_point = Signal()
     on_shape_params = Signal()
     on_shape = Signal()
+    on_msg = Signal()
 
+    message = Property(str, get_msg, set_msg, notify=on_msg)
     shape = Property(str, get_shape, set_shape, notify=on_shape)
     shape_params = Property('QVariantList', get_shape_params, set_shape_params, notify=on_shape_params)
     selected_points = Property('QVariantList', get_selected_points, set_selected_points, notify=on_selected_point)

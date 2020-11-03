@@ -10,9 +10,26 @@ class Viewer(QObject):
         self._selected_file_folder = ""
         self._selected_file_siblings = QStringListModel(self)
         self._supported_file_extensions = r'.png$|.jpg$'
+        self._next_file = ""
 
     def get_selected_file(self):
         return self._selected_file
+
+    def get_next_file(self):
+        return self._next_file
+
+    @Slot()
+    def set_next_file(self):
+        files = self._selected_file_siblings.stringList()
+        current_index = None
+        for i, s in enumerate(files):
+            if self._selected_file in s:
+                current_index = i
+        if current_index is not None and current_index < len(files) - 1:
+            self.set_selected_file(files[current_index + 1])
+
+        # self.set_selected_file()
+        # self.on_next_file.emit()
 
     def get_selected_file_siblings(self):
         return self._selected_file_siblings
@@ -21,11 +38,11 @@ class Viewer(QObject):
         if isinstance(file, QUrl):
             self._selected_file = file.toLocalFile()
         elif isinstance(file, str):
-            self.selected_file = file
+            self._selected_file = file
         self.on_selected_file.emit()
         # shape_fit.set_shape_params([])
         # shape_fit.set_selected_points([])
-        # print(self._selected_file)
+        print(self._selected_file)
         self._detect_selected_file_siblings()
 
     @Slot(list)
@@ -43,7 +60,8 @@ class Viewer(QObject):
                         # if entry.name != self._selected_file:
                         file_path = os.path.abspath(os.path.join(self._selected_file_folder, entry.name))
                         temp_siblings.append(file_path)
-            # print(temp_siblings)
+            temp_siblings = sorted(temp_siblings)
+            print(temp_siblings)
             self.set_selected_file_siblings(temp_siblings)
 
     on_selected_file = Signal()

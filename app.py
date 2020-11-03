@@ -1,6 +1,8 @@
 # This Python file uses the following encoding: utf-8
 import sys
 import os
+
+from PySide2 import QtGui
 from PySide2.QtQuick import QQuickView
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import QQmlApplicationEngine
@@ -9,10 +11,10 @@ from viewer import Viewer
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
-
     app.setOrganizationName("Some Company")
     app.setOrganizationDomain("somecompany.com")
     app.setApplicationName("Amazing Application")
+    app.setWindowIcon(QtGui.QIcon('icons/icons8-spreadsheet-file-64.png'))
 
     view = QQuickView()
     view.setResizeMode(QQuickView.SizeRootObjectToView)

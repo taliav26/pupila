@@ -365,33 +365,53 @@ ApplicationWindow {
 
                  Row {
                      spacing: 10
+                     padding: 5
 
                      RoundButton {
                          visible: shape_fit.shape_params.length > 0
                          text: " Guardar "
+                         icon.source: "icons/icons8-checkmark.svg"
+                         icon.color: "transparent"
                          width:rightItem.width*0.4
                          height: rightItem.height*0.08
                          palette {
                                  button: "lightgreen"
                                  buttonText: "black"
                              }
-                         //flat: true
-                         onClicked:
-                            {shape_fit.save2csv(viewer.selected_file)// model.submit()
-
-                            }
+                         onClicked: shape_fit.save2csv(viewer.selected_file)
                      }
+                    }
+
+                 Row{
+                     spacing: 10
+                     padding: 5
 
                      RoundButton {
                           visible: shape_fit.shape_params.length > 0
                           text: "Cancel"
                           width:rightItem.width*0.4
                           height: rightItem.height*0.08
-                          highlighted: true
-                          onClicked: model.revert()
+                          icon.source: "icons/icons8-delete.svg"
+                          icon.color: "transparent"
+                          onClicked: shape_fit.reset_shape()
                             }
                         }
 
+                 Row {
+                     spacing: 10
+                     padding: 5
+
+                     RoundButton{
+                         visible: shape_fit.shape_params.length > 0
+                         text: "Next"
+                         icon.source: "icons/icons8-next-page-64.png"
+                         icon.color: "transparent"
+                         width:rightItem.width*0.4
+                         height: rightItem.height*0.08
+                         onClicked: viewer.set_next_file()
+
+                     }
+                 }
                    }
         }
     }
@@ -412,6 +432,26 @@ ApplicationWindow {
             padding: 5
             elide: Text.ElideRight
             text: ""
+        }
+    }
+
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        height: message.height
+        width: message.width
+        border.color: Material.color(Material.Grey, Material.Shade200)
+        color: "lightgreen" //Material.color(Material.LightGreen, Material.Shade100)
+        visible: message.text.length > 0
+        z: 30
+        Label {
+            id:message
+            width: rightItem.width
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            padding: 10
+            elide: Text.ElideRight
+            text: shape_fit.message
         }
     }
 
