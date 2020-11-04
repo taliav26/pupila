@@ -22,7 +22,7 @@ ApplicationWindow {
     }
 
     function setTempOutputImage() {
-        viewer.selected_file = "output.jpg"
+        viewer.set_temp_selected_file(image_op.temp_output_name)
     }
 
     menuBar: MenuBar {
@@ -49,14 +49,50 @@ ApplicationWindow {
             Action { text: qsTr("&Circle")
                 onTriggered: shape_fit.shape = "circle"
             }
-            Action { text: qsTr("&Paste") }
         }
         Menu {
             title: qsTr("&Image")
             enabled: viewer.selected_file !== ""
-            Action { text: qsTr("Equalize histogram")
+            Action {
+                text: qsTr("Equalize histogram")
                 onTriggered: {
-                    image_op.histogram_eq(viewer.selected_file)
+                    image_op.histogram_eq(viewer.original_selected_file)
+                }
+            }
+            Action {
+                text: qsTr("Thresholding")
+                onTriggered: {
+                    image_op.detect_optimal_threshold(viewer.original_selected_file)
+                    thresholdSlider.value = image_op.optimal_threshold
+                    viewer.show_threshold_slider = true
+                    viewer.show_gamma_gain_slider = false
+                    viewer.show_log_gain_slider = false
+                    image_op.threshold(viewer.original_selected_file, image_op.optimal_threshold)
+                }
+            }
+            Menu {
+                title: qsTr("Contrast adjustment")
+                Action {
+                    text: qsTr("Gamma correction")
+                    property int defaultGammaGain: 2
+                    onTriggered: {
+                        gammaGainSlider.value = defaultGammaGain
+                        viewer.show_gamma_gain_slider = true
+                        viewer.show_log_gain_slider = false
+                        viewer.show_threshold_slider = false
+                        image_op.gamma(viewer.original_selected_file, defaultGammaGain)
+                    }
+                }
+                Action {
+                    text: qsTr("Logarithmic correction")
+                    property int defaultLogGain: 2
+                    onTriggered: {
+                        logGainSlider.value = defaultLogGain
+                        viewer.show_log_gain_slider = true
+                        viewer.show_gamma_gain_slider = false
+                        viewer.show_threshold_slider = false
+                        image_op.logarithmic(viewer.original_selected_file, defaultLogGain)
+                    }
                 }
             }
         }
@@ -138,13 +174,13 @@ ApplicationWindow {
                 z: dragArea.z+1
                 visible: (viewer.selected_file.toString() === "")
                 Label {
-                    text: qsTr("Arrastra una imagen aquí para abrir")
+                    text: qsTr("Drag and drop an image here to open")
                     color: Material.color(Material.Grey, Material.Shade400)
                     anchors.centerIn: parent
 
                 }
 
-                    }
+            }
 
 
             BusyIndicator {
@@ -257,7 +293,6 @@ ApplicationWindow {
                         property real m_min: 0.2
 
                         onPinchStarted: {
-                            console.log("Pinch Started")
                             m_x1 = scaler.origin.x
                             m_y1 = scaler.origin.y
                             m_x2 = pinch.startCenter.x
@@ -266,7 +301,6 @@ ApplicationWindow {
                             rect.y = rect.y + (pinchArea.m_y1-pinchArea.m_y2)*(1-pinchArea.m_zoom1)
                         }
                         onPinchUpdated: {
-                            console.log("Pinch Updated")
                             m_zoom1 = scaler.xScale
                             var dz = pinch.scale-pinch.previousScale
                             var newZoom = m_zoom1+dz
@@ -303,7 +337,6 @@ ApplicationWindow {
                             }
 
                             onWheel: {
-                                console.log("Wheel Scrolled")
                                 pinchArea.m_x1 = scaler.origin.x
                                 pinchArea.m_y1 = scaler.origin.y
                                 pinchArea.m_zoom1 = scaler.xScale
@@ -329,8 +362,6 @@ ApplicationWindow {
                                 rect.x = rect.x + (pinchArea.m_x1-pinchArea.m_x2)*(1-pinchArea.m_zoom1)
                                 rect.y = rect.y + (pinchArea.m_y1-pinchArea.m_y2)*(1-pinchArea.m_zoom1)
 
-                                console.debug(rect.width+" -- "+rect.height+"--"+rect.scale)
-
                             }
                         }
                     }
@@ -340,7 +371,7 @@ ApplicationWindow {
 
         Rectangle {
             id: rightItem
-            visible: shape_fit.selected_points.length > 0
+            visible: viewer.show_threshold_slider || viewer.show_gamma_gain_slider || viewer.show_log_gain_slider || shape_fit.selected_points.length > 0
             SplitView.minimumWidth: 0
             SplitView.preferredWidth: window.width*0.2
             SplitView.maximumWidth: window.width*0.3
@@ -348,86 +379,151 @@ ApplicationWindow {
 
 
             Column {
+                padding: 10
 
-                Repeater {
-                     model: shape_fit.selected_points //["apples", "oranges", "pears"]
-                     Text { text: "Punto " + (index + 1).toString() + ": (" + Math.round(modelData.x) + ", " + Math.round(modelData.y) + ")" }
-
-                }
-
-                 Text {
-
-                     id: params
-                     textFormat: Text.RichText
-                     font.family: "Liberation Sans"
-                     font.pixelSize: 14
-                     visible:shape_fit.shape_params.length > 0
-                     text:"<h3><br>Parámetros</h3>" + getShapeParamsFormattedText()
-
-                     function getShapeParamsFormattedText() {
-                         var text = "Centro: (" + Math.round(shape_fit.shape_params[0]) +", " + Math.round(shape_fit.shape_params[1]) + ")<br>"
-                         if (shape_fit.shape === "ellipse") {
-                             text += "Semieje mayor: " + Math.round(shape_fit.shape_params[2]) + " px<br>" +
-                                     "Semieje menor: " + Math.round(shape_fit.shape_params[3]) + " px<br>" +
-                                     "Ángulo de rotación: " + Math.round (shape_fit.shape_params[4] * 180 / Math.PI) + "°<br>"
-                         } else if (shape_fit.shape === "circle") {
-                             text += "Radio: " + Math.round(shape_fit.shape_params[2]) + " px<br>"
-                         }
-                         return text
-                     }
-                 }
-                 padding: 10
-
-                 Row {
-                     spacing: 10
-                     padding: 5
-
-                     RoundButton {
-                         visible: shape_fit.shape_params.length > 0
-                         text: " Guardar "
-                         icon.source: "icons/icons8-checkmark.svg"
-                         icon.color: "transparent"
-                         width:rightItem.width*0.4
-                         height: rightItem.height*0.08
-                         palette {
-                                 button: "lightgreen"
-                                 buttonText: "black"
-                             }
-                         onClicked: shape_fit.save2csv(viewer.selected_file)
-                     }
+                Column {
+                    Text {
+                        visible: shape_fit.selected_points.length > 0
+                        text: "<h4>" + qsTr("Selected points")  + "</h4>"
                     }
 
-                 Row{
-                     spacing: 10
-                     padding: 5
+                    Repeater {
+                        model: shape_fit.selected_points
+                        Text { text: qsTr("Point ") + (index + 1).toString() + ": (" + Math.round(modelData.x) + ", " + Math.round(modelData.y) + ")" }
+                    }
+                }
 
-                     RoundButton {
-                          visible: shape_fit.shape_params.length > 0
-                          text: "Cancel"
-                          width:rightItem.width*0.4
-                          height: rightItem.height*0.08
-                          icon.source: "icons/icons8-delete.svg"
-                          icon.color: "transparent"
-                          onClicked: shape_fit.reset_shape()
-                            }
+                Row {
+                    Text {
+                        id: params
+                        textFormat: Text.RichText
+                        font.family: "Liberation Sans"
+                        font.pixelSize: 14
+                        visible:shape_fit.shape_params.length > 0
+                        text: "<h4><br>" + qsTr("Parameters") + "</h4>" + getShapeParamsFormattedText()
+
+                        function getShapeParamsFormattedText() {
+                         var text = qsTr("Center") + ": (" + Math.round(shape_fit.shape_params[0]) +", " + Math.round(shape_fit.shape_params[1]) + ")<br>"
+                         if (shape_fit.shape === "ellipse") {
+                             text += qsTr("Major axis") + ": " + Math.round(shape_fit.shape_params[2]) + " px<br>" +
+                                     qsTr("Minor axis") + ": " + Math.round(shape_fit.shape_params[3]) + " px<br>" +
+                                     qsTr("Rotation angle") + ": " + Math.round (shape_fit.shape_params[4] * 180 / Math.PI) + "°<br>"
+                         } else if (shape_fit.shape === "circle") {
+                             text += qsTr("Radius") + ": " + Math.round(shape_fit.shape_params[2]) + " px<br>"
+                         }
+                         return text
                         }
+                    }
+                }
 
-                 Row {
-                     spacing: 10
-                     padding: 5
+                Column {
+                    Text {
+                     visible: viewer.show_threshold_slider
+                     text: qsTr("Threshold value") + ": " + thresholdSlider.value.toString()
+                    }
+                    Slider{
+                     id:thresholdSlider
+                     visible: viewer.show_threshold_slider
+                     from:0
+                     to:255
+                     stepSize: 1
+                     width: rightItem.width - 30
+                     property int last_value: 0
+                     onMoved:
+                         {
+                             if (value > last_value + 5 || value < last_value - 5) {
+                                 last_value = value
+                                 image_op.threshold(viewer.original_selected_file, value)
+                             }
+                         }
+                    }
 
-                     RoundButton{
-                         visible: shape_fit.shape_params.length > 0
-                         text: "Next"
-                         icon.source: "icons/icons8-next-page-64.png"
-                         icon.color: "transparent"
-                         width:rightItem.width*0.4
-                         height: rightItem.height*0.08
-                         onClicked: viewer.set_next_file()
+                    Text {
+                     visible: viewer.show_gamma_gain_slider
+                     text: qsTr("Gamma gain") + ": " + gammaGainSlider.value.toString()
+                    }
+                    Slider{
+                     id:gammaGainSlider
+                     visible: viewer.show_gamma_gain_slider
+                     from:1
+                     to:10
+                     stepSize: 0.5
+                     width: rightItem.width - 30
+                     property int last_value: 0
+                     onMoved:
+                         {
+                             if (value > last_value + 0.5 || value < last_value - 0.5) {
+                                 last_value = value
+                                 image_op.gamma(viewer.original_selected_file, value)
+                             }
+                         }
+                    }
 
+
+
+                    Text {
+                     visible: viewer.show_log_gain_slider
+                     text: qsTr("Logarithmic gain") + ": " + logGainSlider.value.toString()
+                    }
+                    Slider{
+                     id:logGainSlider
+                     visible: viewer.show_log_gain_slider
+                     from:1
+                     to:10
+                     stepSize: 0.2
+                     width: rightItem.width - 30
+                     property int last_value: 0
+                     onMoved:
+                         {
+                             if (value > last_value + 0.2 || value < last_value - 0.2) {
+                                 last_value = value
+                                 image_op.logarithmic(viewer.original_selected_file, value)
+                             }
+                         }
+                    }
+                }
+
+                Flow {
+                    width: rightItem.width
+                    spacing: 10
+
+                    RoundButton {
+                        visible: shape_fit.shape_params.length > 0
+                        text: qsTr("Save")
+                        icon.source: "icons/icons8-checkmark.svg"
+                        icon.color: "transparent"
+                        height: 40
+                        rightPadding: 15
+                        palette {
+                             button: "lightgreen"
+                             buttonText: "black"
+                         }
+                        onClicked: shape_fit.save2csv(viewer.selected_file)
                      }
-                 }
-                   }
+
+                    RoundButton {
+                        visible: shape_fit.shape_params.length > 0
+                        text: qsTr("Cancel")
+                        height: 40
+                        rightPadding: 15
+                        icon.source: "icons/icons8-delete.svg"
+                        icon.color: "transparent"
+                        onClicked: shape_fit.reset_shape("")
+                    }
+
+                    RoundButton{
+                        visible: shape_fit.shape_params.length > 0 && viewer.next_file.toString()
+                        text: qsTr("Next")
+                        icon.source: "icons/icons8-next-page-64.png"
+                        icon.color: "transparent"
+                        height: 40
+                        rightPadding: 15
+                        onClicked: viewer.selected_file = viewer.next_file
+                     }
+                }
+
+
+            }
         }
     }
 
@@ -473,7 +569,7 @@ ApplicationWindow {
 
     FileDialog{
         id: fileDialog
-        title: qsTr("Seleccionar archivo o carpeta")
+        title: qsTr("Open image")
         nameFilters: [ "Image files (*.jpg *.png *.bmp)" ]
         onAccepted: {
 

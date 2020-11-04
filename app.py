@@ -34,7 +34,8 @@ if __name__ == "__main__":
     engine.load(qml_file)
 
     shape_fit.on_shape_params.connect(engine.rootObjects()[0].updateEllipse)
-    image_operations.hist_eq_result.connect(engine.rootObjects()[0].setTempOutputImage)
+    image_operations.result_ready.connect(engine.rootObjects()[0].setTempOutputImage)
 
     rc = app.exec_()
+
     sys.exit(rc)

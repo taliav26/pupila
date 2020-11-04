@@ -17,6 +17,7 @@ class ShapeFit(QObject):
         self._msg = ""
         self.worker_thread = None
 
+    # self._selected_points
     def get_selected_points(self):
         return self._selected_points
 
@@ -24,6 +25,7 @@ class ShapeFit(QObject):
         self._selected_points = points
         self.on_selected_point.emit()
 
+    # self._shape_params
     def get_shape_params(self):
         return self._shape_params
 
@@ -36,22 +38,25 @@ class ShapeFit(QObject):
         self._shape_params = params
         self.on_shape_params.emit()
 
-    @Slot()
-    def reset_shape(self):
-        self.set_shape_params([])
-        self.set_selected_points([])
-        self._msg = ""
-        self.on_msg.emit()
-
+    # self._shape
     @Slot()
     def get_shape(self):
         return self._shape
 
     @Slot(str)
     def set_shape(self, shape):
-        self.reset_shape()
+        self.reset_shape("")
         self._shape = shape
         self.on_shape.emit()
+
+    # auxiliary methods
+    @Slot(str)
+    def reset_shape(self, selected_file):
+        if "_temp_output" not in selected_file:
+            self.set_shape_params([])
+            self.set_selected_points([])
+            self._msg = ""
+            self.on_msg.emit()
 
     @Slot(QPointF)
     def add_new_point(self, point):
@@ -121,6 +126,7 @@ class ShapeFit(QObject):
         print(params)
         self.set_shape_params(params)
 
+    # self._msg
     def get_msg(self):
         return self._msg
 
@@ -128,11 +134,13 @@ class ShapeFit(QObject):
         self._msg = text
         return self._msg
 
+    # signals
     on_selected_point = Signal()
     on_shape_params = Signal()
     on_shape = Signal()
     on_msg = Signal()
 
+    # properties
     message = Property(str, get_msg, set_msg, notify=on_msg)
     shape = Property(str, get_shape, set_shape, notify=on_shape)
     shape_params = Property('QVariantList', get_shape_params, set_shape_params, notify=on_shape_params)
