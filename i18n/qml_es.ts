@@ -80,91 +80,116 @@
     </message>
     <message>
         <location filename="../view.qml" line="100"/>
+        <source>Configuration</source>
+        <translation>Configuración</translation>
+    </message>
+    <message>
+        <location filename="../view.qml" line="102"/>
+        <source>Language</source>
+        <translation>Lenguaje</translation>
+    </message>
+    <message>
+        <location filename="../view.qml" line="104"/>
+        <source>English</source>
+        <translation>Inglés</translation>
+    </message>
+    <message>
+        <location filename="../view.qml" line="107"/>
+        <source>Spanish</source>
+        <translation>Español</translation>
+    </message>
+    <message>
+        <location filename="../view.qml" line="110"/>
+        <source>French</source>
+        <translation>Francés</translation>
+    </message>
+    <message>
+        <location filename="../view.qml" line="115"/>
         <source>&amp;Help</source>
         <translation>Ayu&amp;da</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="101"/>
+        <location filename="../view.qml" line="116"/>
         <source>&amp;About</source>
         <translation>Acer&amp;ca de..</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="177"/>
+        <location filename="../view.qml" line="192"/>
         <source>Drag and drop an image here to open</source>
         <translation>Arrastre una imagen aquí para abrir</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="387"/>
+        <location filename="../view.qml" line="402"/>
         <source>Selected points</source>
         <translation>Puntos seleccionados</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="392"/>
+        <location filename="../view.qml" line="407"/>
         <source>Point </source>
         <translation>Punto</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="403"/>
+        <location filename="../view.qml" line="418"/>
         <source>Parameters</source>
         <translation>Parámetros</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="406"/>
+        <location filename="../view.qml" line="421"/>
         <source>Center</source>
         <translation>Centro</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="408"/>
+        <location filename="../view.qml" line="423"/>
         <source>Major axis</source>
         <translation>Semieje mayor</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="409"/>
+        <location filename="../view.qml" line="424"/>
         <source>Minor axis</source>
         <translation>Semieje menor</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="410"/>
+        <location filename="../view.qml" line="425"/>
         <source>Rotation angle</source>
         <translation>Ángulo de rotación</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="412"/>
+        <location filename="../view.qml" line="427"/>
         <source>Radius</source>
         <translation>Radio</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="422"/>
+        <location filename="../view.qml" line="437"/>
         <source>Threshold value</source>
         <translation>Umbral</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="443"/>
+        <location filename="../view.qml" line="458"/>
         <source>Gamma gain</source>
         <translation>Ganancia gamma</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="466"/>
+        <location filename="../view.qml" line="481"/>
         <source>Logarithmic gain</source>
         <translation>Ganancia logarítmica</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="492"/>
+        <location filename="../view.qml" line="507"/>
         <source>Save</source>
         <translation>Guardar</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="506"/>
+        <location filename="../view.qml" line="521"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="516"/>
+        <location filename="../view.qml" line="531"/>
         <source>Next</source>
         <translation>Siguiente</translation>
     </message>
     <message>
-        <location filename="../view.qml" line="572"/>
+        <location filename="../view.qml" line="587"/>
         <source>Open image</source>
         <translation>Abrir imagen</translation>
     </message>

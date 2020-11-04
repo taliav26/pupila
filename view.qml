@@ -97,6 +97,21 @@ ApplicationWindow {
             }
         }
         Menu {
+            title: qsTr("Configuration")
+            Menu {
+                title: qsTr("Language")
+                Action {
+                    text: qsTr("English")
+                }
+                Action {
+                    text: qsTr("Spanish")
+                }
+                Action {
+                    text: qsTr("French")
+                }
+            }
+        }
+        Menu {
             title: qsTr("&Help")
             Action { text: qsTr("&About") }
         }
