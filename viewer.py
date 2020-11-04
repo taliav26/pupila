@@ -15,21 +15,9 @@ class Viewer(QObject):
     def get_selected_file(self):
         return self._selected_file
 
-    def get_next_file(self):
-        return self._next_file
-
     @Slot()
     def set_next_file(self):
-        files = self._selected_file_siblings.stringList()
-        current_index = None
-        for i, s in enumerate(files):
-            if self._selected_file in s:
-                current_index = i
-        if current_index is not None and current_index < len(files) - 1:
-            self.set_selected_file(files[current_index + 1])
-
-        # self.set_selected_file()
-        # self.on_next_file.emit()
+        self.set_selected_file(self._next_file)
 
     def get_selected_file_siblings(self):
         return self._selected_file_siblings
@@ -42,8 +30,17 @@ class Viewer(QObject):
         self.on_selected_file.emit()
         # shape_fit.set_shape_params([])
         # shape_fit.set_selected_points([])
-        print(self._selected_file)
-        self._detect_selected_file_siblings()
+        # print(self._selected_file)
+        if "output.jpg" not in self._selected_file:
+            self._detect_selected_file_siblings()
+            files = self._selected_file_siblings.stringList()
+            current_index = None
+            for i, s in enumerate(files):
+                if self._selected_file in s:
+                    current_index = i
+            if current_index is not None and current_index < len(files) - 1:
+                self._next_file = files[current_index + 1]
+
 
     @Slot(list)
     def set_selected_file_siblings(self, files):

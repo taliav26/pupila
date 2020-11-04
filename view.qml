@@ -12,12 +12,17 @@ ApplicationWindow {
     visible:true
     title: qsTr("PUPILA: Pupil Annotation")
 
+
     function updateEllipse() {
         var context = ellipse_canvas.getContext("2d")
         context.reset()
         if (shape_fit.shape_params.length === 5) {
            ellipse_canvas.requestPaint()
         }
+    }
+
+    function setTempOutputImage() {
+        viewer.selected_file = "output.jpg"
     }
 
     menuBar: MenuBar {
@@ -37,6 +42,7 @@ ApplicationWindow {
         }
         Menu {
             title: qsTr("&Fit")
+            enabled: viewer.selected_file !== ""
             Action { text: qsTr("Ellipse")
                 onTriggered:shape_fit.shape = "ellipse"
                    }
@@ -44,6 +50,15 @@ ApplicationWindow {
                 onTriggered: shape_fit.shape = "circle"
             }
             Action { text: qsTr("&Paste") }
+        }
+        Menu {
+            title: qsTr("&Image")
+            enabled: viewer.selected_file !== ""
+            Action { text: qsTr("Equalize histogram")
+                onTriggered: {
+                    image_op.histogram_eq(viewer.selected_file)
+                }
+            }
         }
         Menu {
             title: qsTr("&Help")
