@@ -2,13 +2,21 @@
 import sys
 import os
 from PySide2 import QtGui
+from PySide2.QtCore import Slot
 from PySide2.QtQuick import QQuickView
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import QQmlApplicationEngine
-
 from image_operations import ImageOperations
 from shape_fit import ShapeFit
+from translator import Translator
 from viewer import Viewer
+
+
+@Slot()
+def update_app_language():
+    app.installTranslator(translator.translator)
+    engine.retranslate()
+
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
@@ -24,10 +32,13 @@ if __name__ == "__main__":
     viewer = Viewer()
     shape_fit = ShapeFit()
     image_operations = ImageOperations()
+    translator = Translator()
+    translator.updateAppLanguage.connect(update_app_language)
 
     viewer.on_selected_file.connect(shape_fit.reset_shape)
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("viewer", viewer)
+    engine.rootContext().setContextProperty("translator", translator)
     engine.rootContext().setContextProperty("shape_fit", shape_fit)
     engine.rootContext().setContextProperty("image_op", image_operations)
 

@@ -61,7 +61,7 @@
     <message>
         <location filename="../view.qml" line="63"/>
         <source>Thresholding</source>
-        <translation>Limitation</translation>
+        <translation>Seuillage</translation>
     </message>
     <message>
         <location filename="../view.qml" line="74"/>
@@ -161,7 +161,7 @@
     <message>
         <location filename="../view.qml" line="437"/>
         <source>Threshold value</source>
-        <translation>Valeur de limitation</translation>
+        <translation>Valeur de seuil</translation>
     </message>
     <message>
         <location filename="../view.qml" line="458"/>
