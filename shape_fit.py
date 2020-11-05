@@ -8,13 +8,11 @@ MINIMUM_POINTS = 5
 
 
 class ShapeFit(QObject):
-
     def __init__(self):
         super(ShapeFit, self).__init__()
         self._selected_points = []
         self._shape_params = []
         self._shape = ""
-        self._msg = ""
         self.worker_thread = None
 
     # self._selected_points
@@ -55,8 +53,6 @@ class ShapeFit(QObject):
         if "_temp_output" not in selected_file:
             self.set_shape_params([])
             self.set_selected_points([])
-            self._msg = ""
-            self.on_msg.emit()
 
     @Slot(QPointF)
     def add_new_point(self, point):
@@ -103,12 +99,9 @@ class ShapeFit(QObject):
         df.to_csv(file_name + '.csv', index=False)
 
         if df.empty:
-            self._msg = "The file is empty"
-            self.on_msg.emit()
-
+            self.on_message.emit("The file is empty")
         else:
-            self._msg = "The file was saved successfully"
-            self.on_msg.emit()
+            self.on_message.emit("The file was saved successfully")
 
         '''exp_csv = open(file_name + '.csv', 'w')
         writer = csv.writer(exp_csv)
@@ -118,7 +111,7 @@ class ShapeFit(QObject):
 
     @Slot(str)
     def display_annotation(self, file_name):
-        self.reset_shape()
+        self.reset_shape("")
         data = pd.read_csv(file_name + '.csv')
         data_list = [data.columns.values.tolist()] + data.values.tolist()
         params = data_list[1]  # values x_center, y_center, aprox_radius, major_axis, minor_axis, angle
@@ -126,22 +119,13 @@ class ShapeFit(QObject):
         print(params)
         self.set_shape_params(params)
 
-    # self._msg
-    def get_msg(self):
-        return self._msg
-
-    def set_msg(self, text):
-        self._msg = text
-        return self._msg
-
-    # signals
+       # signals
     on_selected_point = Signal()
     on_shape_params = Signal()
     on_shape = Signal()
-    on_msg = Signal()
+    on_message = Signal(str)
 
     # properties
-    message = Property(str, get_msg, set_msg, notify=on_msg)
     shape = Property(str, get_shape, set_shape, notify=on_shape)
     shape_params = Property('QVariantList', get_shape_params, set_shape_params, notify=on_shape_params)
     selected_points = Property('QVariantList', get_selected_points, set_selected_points, notify=on_selected_point)

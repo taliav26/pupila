@@ -26,6 +26,9 @@ class Viewer(QObject):
         elif isinstance(file, str):
             self._selected_file = file
         self.on_selected_file.emit(self._selected_file)
+        self.set_show_threshold_slider(False)
+        self.set_show_gamma_gain_slider(False)
+        self.set_show_log_gain_slider(False)
         self._original_selected_file = self._selected_file
         self._detect_selected_file_siblings()
         self._detect_selected_file_next()

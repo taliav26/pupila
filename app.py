@@ -7,6 +7,7 @@ from PySide2.QtQuick import QQuickView
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import QQmlApplicationEngine
 from image_operations import ImageOperations
+from notification import Notification
 from shape_fit import ShapeFit
 from translator import Translator
 from viewer import Viewer
@@ -31,9 +32,11 @@ if __name__ == "__main__":
 
     viewer = Viewer()
     shape_fit = ShapeFit()
+    notification = Notification()
     image_operations = ImageOperations()
     translator = Translator()
     translator.updateAppLanguage.connect(update_app_language)
+    shape_fit.on_message.connect(notification.show_notification)
 
     viewer.on_selected_file.connect(shape_fit.reset_shape)
     engine = QQmlApplicationEngine()
@@ -41,6 +44,7 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("translator", translator)
     engine.rootContext().setContextProperty("shape_fit", shape_fit)
     engine.rootContext().setContextProperty("image_op", image_operations)
+    engine.rootContext().setContextProperty("notification", notification)
 
     engine.load(qml_file)
 

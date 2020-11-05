@@ -34,7 +34,7 @@ ApplicationWindow {
                 onTriggered: fileDialog.open()
             }
             Action { text: qsTr("&Show Annotation")
-                onTriggered: shape_fit.display_annotation(viewer.selected_file)
+                onTriggered: shape_fit.display_annotation(viewer.original_selected_file)
             }
             Action { text: qsTr("Save &As...") }
             MenuSeparator { }
@@ -571,22 +571,22 @@ ApplicationWindow {
     }
 
     Rectangle {
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        height: message.height
-        width: message.width
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 10
+        height: notification_message.height
+        width: notification_message.width
         border.color: Material.color(Material.Grey, Material.Shade200)
         color: "lightgreen" //Material.color(Material.LightGreen, Material.Shade100)
-        visible: message.text.length > 0
+        visible: notification_message.text.length > 0
         z: 30
         Label {
-            id:message
-            width: rightItem.width
+            id:notification_message
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             padding: 10
             elide: Text.ElideRight
-            text: shape_fit.message
+            text: notification.message
         }
     }
 
