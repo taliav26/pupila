@@ -97,6 +97,30 @@ ApplicationWindow {
             }
         }
         Menu {
+            title: qsTr("Configuration")
+            Menu {
+                title: qsTr("Language")
+                Action {
+                    text: qsTr("English")
+                    onTriggered: {
+                        translator.set_language("en")
+                    }
+                }
+                Action {
+                    text: qsTr("Spanish")
+                    onTriggered: {
+                        translator.set_language("es")
+                    }
+                }
+                Action {
+                    text: qsTr("French")
+                    onTriggered: {
+                        translator.set_language("fr")
+                    }
+                }
+            }
+        }
+        Menu {
             title: qsTr("&Help")
             Action { text: qsTr("&About") }
         }
