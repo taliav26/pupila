@@ -16,7 +16,7 @@
     <message>
         <location filename="../view.qml" line="33"/>
         <source>&amp;Open...</source>
-        <translation>Ouvert</translation>
+        <translation>Ouvrir</translation>
     </message>
     <message>
         <location filename="../view.qml" line="36"/>

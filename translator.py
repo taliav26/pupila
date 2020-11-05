@@ -1,7 +1,5 @@
 from PySide2.QtCore import QObject, QTranslator, Slot, Signal
 
-global app
-
 
 class Translator(QObject):
     updateAppLanguage = Signal()
